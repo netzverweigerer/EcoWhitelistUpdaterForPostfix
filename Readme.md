@@ -11,7 +11,7 @@ http://www.certified-senders.eu/
 - Signed contract with eco for using the whitelist as ISP.
 - The credentials to download the whitelist in XML format.
 - The downloading server needs to be in the firewall rules of eco with his IP address.
-- PHP CLI to execute the convert script
+- PHP CLI to execute the convert script (on Debian: apt-get install php5-cli)
 - And of course Postfix (:
 
 2. Integration:
