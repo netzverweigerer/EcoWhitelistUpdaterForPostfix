@@ -3,8 +3,6 @@ EcoWhitelistUpdaterForPostfix
 
 This is a bunch of scripts for using the whitelist from the Certified Senders Alliance. This is a mailserver whitelist project initiated by eco - Verband der deutschen Internetwirtschaft e.V. More informations you get on the official website: http://www.certified-senders.eu/
 
-Overview
-----------------
 The shell script will be executed via cronjob. This script loads the eco whitelist in XML format and converts it with the php script and the SimpleXML extension (included since PHP 5.x) to a Postfix hash file. At the end the hash file will also be converted with postmap to Berkeley DB.
 
 1. Requirements:
