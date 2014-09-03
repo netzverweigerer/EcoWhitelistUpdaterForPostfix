@@ -24,11 +24,13 @@ The shell script will be executed via cronjob. This script loads the eco whiteli
 - Add this line to update the whitelist on midnight: 0 0 * * * /etc/postfix/eco-whitelist/eco-postfix-whitelist-update >/dev/null 2>&1
 - Edit the smtpd_recipient_restrictions section in the main.cf of postfix and restart it (/etc/init.d/postfix restart).
 
-> smtpd_recipient_restrictions =  
->  [...]  
->  reject_unauth_destination  
->  #eco whitelist  
->  check_client_access hash:/etc/postfix/eco-whitelist/rbl_override  
->  reject_rbl_client dnsbl.sorbs.net  
->  reject_rbl_client bl.spamcop.net  
->  [...]  
+```ini
+ smtpd_recipient_restrictions =  
+  [...]  
+  reject_unauth_destination  
+  #eco whitelist  
+  check_client_access hash:/etc/postfix/eco-whitelist/rbl_override  
+  reject_rbl_client dnsbl.sorbs.net  
+  reject_rbl_client bl.spamcop.net  
+  [...]  
+```
