@@ -7,8 +7,8 @@
 ## Configuration
 
 ## eco whitelist credentials
-USER="your eco user"
-PASSWORD="your eco pw"
+ECOUSER="your eco user"
+ECOPASS="your eco pw"
 
 ## Download URL for the eco whitelist
 WHITELISTURL="https://****/csa-whitelist.xml"
@@ -26,7 +26,7 @@ done=false
 found=false
 if [ $? -eq 0 ]; then
 	found=true
-	wget --http-user=${USER} --http-passwd=${PASSWORD} --no-check-certificate -N -O ${WHITELISTPATH} ${WHITELISTURL}
+	wget --http-user=${ECOUSER} --http-passwd=${ECOPASS} --no-check-certificate -N -O ${WHITELISTPATH} ${WHITELISTURL}
 	[ $? -eq 0 ] && done=true
 fi
 
@@ -34,7 +34,7 @@ if [ $done -eq false ]; then
 	out=`which curl`
 	if [ $? -eq 0 ]; then
 		found=true
-		curl --user "${USER}:${PASSWORD}" --insecure ${WHITELISTURL} > ${WHITELISTPATH}
+		curl --user "${ECOUSER}:${ECOPASS}" --insecure ${WHITELISTURL} > ${WHITELISTPATH}
 		[ $? -eq 0 ] && done=true
 	fi
 fi
