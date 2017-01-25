@@ -1,5 +1,8 @@
 #!/bin/sh
 ## Author: Patrick Baber
+## Updated: Franz Bettag
+
+# MAKE SURE YOUR PATH IS SET CORRECTLY TO CONTAIN ALL REQUIRED BINARIES HERE
 
 ## Configuration
 
@@ -10,26 +13,43 @@ PASSWORD="your eco pw"
 ## Download URL for the eco whitelist
 WHITELISTURL="https://****/csa-whitelist.xml"
 
+POSTFIXPATH="/etc/postfix"
+
 ## Local path for the whitelist in xml format
-WHITELISTPATH="/etc/postfix/eco-whitelist/csa-whitelist.xml"
+WHITELISTPATH="$POSTFIXPATH/eco-whitelist/csa-whitelist.xml"
 
 ## Path to postfix whitelist
-POSTFIXWHITELISTPATH="/etc/postfix/eco-whitelist/rbl_override"
+POSTFIXWHITELISTPATH="$POSTFIXPATH/eco-whitelist/rbl_override"
 
-## Path to PHP convert script
-PHPCONVERTPATH="/etc/postfix/eco-whitelist/eco-postfix-whitelist-convert.php"
+out=`which wget`
+done=false
+found=false
+if [ $0 -eq 0 ]; then
+	found=true
+	wget --http-user=${USER} --http-passwd=${PASSWORD} --no-check-certificate -N -O ${WHITELISTPATH} ${WHITELISTURL}
+	[ $0 -eq 0 ] && done=true
+fi
 
-## Path to wget
-WGETPATH="/usr/bin/wget"
+if [ $done -eq false ]; then
+	out=`which curl`
+	if [ $0 -eq 0 ]; then
+		found=true
+		curl --user "${USER}:${PASSWORD}" --insecure ${WHITELISTURL} > ${WHITELISTPATH}
+		[ $0 -eq 0 ] && done=true
+	fi
+fi
 
-## Path to php cli
-PHPPATH="/usr/bin/php"
+if [ $found -ne true ]; then
+	echo "Neither wget nor curl found in PATH! aborting.."
+	exit 1
+fi
 
-## Path to the postfix tool postmap
-POSTMAPPATH="/usr/sbin/postmap"
+if [ $done -ne true ]; then
+	echo "Unable to download whitelist! aborting.."
+	exit 1
+fi
 
-${WGETPATH} --http-user=${USER} --http-passwd=${PASSWORD} --no-check-certificate -N -O ${WHITELISTPATH} ${WHITELISTURL}
-${PHPPATH} -f ${PHPCONVERTPATH} ${WHITELISTPATH} ${POSTFIXWHITELISTPATH}
-${POSTMAPPATH} ${POSTFIXWHITELISTPATH}
+egrep -oe '<IP>[^<]+</IP>' ${WHITELISTPATH} | sed -e 's;<IP>;;g' -e 's;</IP>; OK;g' > ${POSTFIXWHITELISTPATH}
+postmap ${POSTFIXWHITELISTPATH}
 
 exit 0
