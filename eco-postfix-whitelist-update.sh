@@ -24,18 +24,18 @@ POSTFIXWHITELISTPATH="$POSTFIXPATH/eco-whitelist/rbl_override"
 out=`which wget`
 done=false
 found=false
-if [ $0 -eq 0 ]; then
+if [ $? -eq 0 ]; then
 	found=true
 	wget --http-user=${USER} --http-passwd=${PASSWORD} --no-check-certificate -N -O ${WHITELISTPATH} ${WHITELISTURL}
-	[ $0 -eq 0 ] && done=true
+	[ $? -eq 0 ] && done=true
 fi
 
 if [ $done -eq false ]; then
 	out=`which curl`
-	if [ $0 -eq 0 ]; then
+	if [ $? -eq 0 ]; then
 		found=true
 		curl --user "${USER}:${PASSWORD}" --insecure ${WHITELISTURL} > ${WHITELISTPATH}
-		[ $0 -eq 0 ] && done=true
+		[ $? -eq 0 ] && done=true
 	fi
 fi
 
