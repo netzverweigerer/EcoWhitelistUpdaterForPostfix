@@ -1,55 +1,40 @@
 #!/bin/sh
 ## Author: Patrick Baber
 ## Updated: Franz Bettag
-
-# MAKE SURE YOUR PATH IS SET CORRECTLY TO CONTAIN ALL REQUIRED BINARIES HERE
-
-## Configuration
+## Updated even more: Armin Jenewein (@netzverweigerer on GitHub)
 
 ## eco whitelist credentials
-USER="your eco user"
-PASSWORD="your eco pw"
+user="your eco user"
+password="your eco pw"
 
 ## Download URL for the eco whitelist
-WHITELISTURL="https://****/csa-whitelist.xml"
+whitelist="https://****/csa-whitelist.xml"
 
-POSTFIXPATH="/etc/postfix"
+postfix="/etc/postfix"
 
 ## Local path for the whitelist in xml format
-WHITELISTPATH="$POSTFIXPATH/eco-whitelist/csa-whitelist.xml"
+whitelist="$postfix/eco-whitelist/csa-whitelist.xml"
 
 ## Path to postfix whitelist
-POSTFIXWHITELISTPATH="$POSTFIXPATH/eco-whitelist/rbl_override"
+override="$postfix/eco-whitelist/rbl_override"
 
-out=`which wget`
-done=false
-found=false
-if [ $0 -eq 0 ]; then
-	found=true
-	wget --http-user=${USER} --http-passwd=${PASSWORD} --no-check-certificate -N -O ${WHITELISTPATH} ${WHITELISTURL}
-	[ $0 -eq 0 ] && done=true
-fi
+bailout () {
+  echo "ERROR: $@"
+  exit 255
+}
 
-if [ $done -eq false ]; then
-	out=`which curl`
-	if [ $0 -eq 0 ]; then
-		found=true
-		curl --user "${USER}:${PASSWORD}" --insecure ${WHITELISTURL} > ${WHITELISTPATH}
-		[ $0 -eq 0 ] && done=true
-	fi
-fi
+depcheck () {
+  which "$@" >/dev/null 2>&1 || bailout "$@ not found in \$PATH. Exiting."
+}
 
-if [ $found -ne true ]; then
-	echo "Neither wget nor curl found in PATH! aborting.."
-	exit 1
-fi
+depcheck wget
+depcheck curl
 
-if [ $done -ne true ]; then
-	echo "Unable to download whitelist! aborting.."
-	exit 1
-fi
+wget --http-user=${user} --http-passwd=${password} --no-check-certificate -N -O ${whitelist} ${whitelist} || bailout "wget returned non-zero exit code. Exiting."
+curl --user "${user}:${password}" --insecure ${whitelist} > ${whitelist} || bailout "curl returned non-zero exit code. Exiting."
 
-egrep -oe '<IP>[^<]+</IP>' ${WHITELISTPATH} | sed -e 's;<IP>;;g' -e 's;</IP>; OK;g' > ${POSTFIXWHITELISTPATH}
-postmap ${POSTFIXWHITELISTPATH}
+grep -E -oe '<IP>[^<]+</IP>' ${whitelist} | sed -e 's;<IP>;;g' -e 's;</IP>; OK;g' > ${override}
 
-exit 0
+postmap ${override}
+
+
