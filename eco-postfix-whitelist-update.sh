@@ -46,7 +46,7 @@ fi
 
 case "$downloader" in
   wget)
-  wget --http-user=${user} --http-passwd=${password} --no-check-certificate -N -O ${whitelist} ${whitelist} || bailout "wget returned non-zero exit code. Exiting."
+  wget --http-user="${user}" --http-passwd="${password}" --no-check-certificate -N -O ${whitelist} ${whitelist} || bailout "wget returned non-zero exit code. Exiting."
   ;;
   curl)
     curl --user "${user}:${password}" --insecure ${whitelist} > ${whitelist} || bailout "curl returned non-zero exit code. Exiting."
